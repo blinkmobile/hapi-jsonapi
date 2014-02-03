@@ -1,6 +1,13 @@
 'use strict';
 
 exports.register = function (plugin, options, next) {
+
+  plugin.expose(get, internals.get);
+  plugin.expose(post, internals.post);
+  plugin.expose(put, internals.put);
+  plugin.expose(patch, internals.patch);
+  plugin.expose(delete, internals.delete);
+
   next();
 };
 
@@ -12,9 +19,7 @@ var internals = {
   server: null
 };
 
-var config = {};
-
-config.get = function (resource, schema, server) {
+internals.get = function (resource, schema, server) {
   return {
     handler: function (request, reply) {
       if (request.params.id) {
@@ -30,7 +35,7 @@ config.get = function (resource, schema, server) {
   };
 };
 
-config.post = function (resource, schema, server) {
+internals.post = function (resource, schema, server) {
   return {
     //validate: internals.validate(resource, schema, types),
     handler: function (request, reply) {
@@ -41,7 +46,7 @@ config.post = function (resource, schema, server) {
   };
 };
 
-config.put = function (resource, schema, server) {
+internals.put = function (resource, schema, server) {
   return {
     validate: internals.validate(resource, schema, types),
     handler: function (request, reply) {
@@ -52,7 +57,7 @@ config.put = function (resource, schema, server) {
   };
 };
 
-config.patch = function (resource, schema, server) {
+internals.patch = function (resource, schema, server) {
   return {
     validate: internals.validate(resource, schema, types),
     handler: function (request, reply) {
@@ -61,7 +66,7 @@ config.patch = function (resource, schema, server) {
   };
 };
 
-config.delete = function (resource, schema, server) {
+internals.delete = function (resource, schema, server) {
   return {
     handler: function (request, reply) {
       server.helpers.remove(resource, request.params.id, function (docs) {
@@ -70,8 +75,6 @@ config.delete = function (resource, schema, server) {
     }
   };
 };
-
-exports.config = config;
 
 internals.validate = function (resource, schema) {
   var validation = {payload: {}},
