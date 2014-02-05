@@ -14,10 +14,7 @@ exports.register = function (plugin, options, next) {
 
 var inflect = require('i')();
 var _ = require('underscore');
-var internals = {
-  Hapi: null,
-  server: null
-};
+var internals = {};
 
 internals.get = function (resource, schema, server) {
   return {
@@ -35,9 +32,9 @@ internals.get = function (resource, schema, server) {
   };
 };
 
-internals.post = function (resource, schema, server) {
+internals.post = function (resource, schema, server, types) {
   return {
-    //validate: internals.validate(resource, schema, types),
+    validate: internals.validate(resource, schema, types),
     handler: function (request, reply) {
       server.helpers.insert(resource, internals.deserialize(resource, request.payload), function (docs) {
         reply(internals.serialize(resource, docs, schema));
@@ -46,7 +43,7 @@ internals.post = function (resource, schema, server) {
   };
 };
 
-internals.put = function (resource, schema, server) {
+internals.put = function (resource, schema, server, types) {
   return {
     validate: internals.validate(resource, schema, types),
     handler: function (request, reply) {
@@ -57,7 +54,7 @@ internals.put = function (resource, schema, server) {
   };
 };
 
-internals.patch = function (resource, schema, server) {
+internals.patch = function (resource, schema, server, types) {
   return {
     validate: internals.validate(resource, schema, types),
     handler: function (request, reply) {
