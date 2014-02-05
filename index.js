@@ -2,11 +2,11 @@
 
 exports.register = function (plugin, options, next) {
 
-  plugin.expose(get, internals.get);
-  plugin.expose(post, internals.post);
-  plugin.expose(put, internals.put);
-  plugin.expose(patch, internals.patch);
-  plugin.expose(delete, internals.delete);
+  plugin.expose('get', internals.get);
+  plugin.expose('post', internals.post);
+  plugin.expose('put', internals.put);
+  plugin.expose('patch', internals.patch);
+  plugin.expose('delete', internals.delete);
 
   next();
 };
