@@ -73,7 +73,7 @@ internals.delete = function (resource, schema, server) {
   };
 };
 
-internals.validate = function (resource, schema) {
+internals.validate = function (resource, schema, types) {
   var validation = {payload: {}},
     resourceSchema = {};
 
