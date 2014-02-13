@@ -20,8 +20,8 @@ internals.get = function (resource, schema, server) {
   return {
     handler: function (request, reply) {
       if (request.params.id) {
-        server.helpers.find(resource, request.params.id, function (docs) {
-          reply(internals.serialize(resource, docs, schema));
+        server.helpers.find(resource, request.params.id, function (doc) {
+          reply(internals.serialize(resource, [doc], schema));
         });
       } else {
         server.helpers.findMany(resource, function (docs) {
