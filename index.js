@@ -1,6 +1,12 @@
 'use strict';
 
+var inflect = require('i')();
+var _ = require('underscore');
+var internals = {};
+
 exports.register = function (plugin, options, next) {
+  plugin.dependency('hapi-bearer');
+  plugin.auth.strategy('bearer', 'bearer');
 
   plugin.expose('get', internals.get);
   plugin.expose('post', internals.post);
@@ -11,20 +17,16 @@ exports.register = function (plugin, options, next) {
   next();
 };
 
-
-var inflect = require('i')();
-var _ = require('underscore');
-var internals = {};
-
 internals.get = function (resource, schema, server) {
   return {
+    auth: 'bearer',
     handler: function (request, reply) {
       if (request.params.id) {
         server.helpers.find(resource, request.params.id, function (doc) {
           reply(internals.serialize(resource, [doc], schema));
         });
       } else {
-        server.helpers.findMany(resource, function (docs) {
+        server.helpers.findMany(resource, {}, function (docs) {
           reply(internals.serialize(resource, docs, schema));
         });
       }
@@ -34,6 +36,7 @@ internals.get = function (resource, schema, server) {
 
 internals.post = function (resource, schema, server, types) {
   return {
+    auth: 'bearer',
     validate: internals.validate(resource, schema, types),
     handler: function (request, reply) {
       server.helpers.insert(resource, internals.deserialize(resource, request.payload), function (docs) {
@@ -45,6 +48,7 @@ internals.post = function (resource, schema, server, types) {
 
 internals.put = function (resource, schema, server, types) {
   return {
+    auth: 'bearer',
     validate: internals.validate(resource, schema, types),
     handler: function (request, reply) {
       server.helpers.update(resource, request.params.id, internals.deserialize(resource, request.payload), function (docs) {
@@ -56,6 +60,7 @@ internals.put = function (resource, schema, server, types) {
 
 internals.patch = function (resource, schema, server, types) {
   return {
+    auth: 'bearer',
     validate: internals.validate(resource, schema, types),
     handler: function (request, reply) {
       reply('Not yet implemented. Sorry!');
@@ -65,6 +70,7 @@ internals.patch = function (resource, schema, server, types) {
 
 internals.delete = function (resource, schema, server) {
   return {
+    auth: 'bearer',
     handler: function (request, reply) {
       server.helpers.remove(resource, request.params.id, function (docs) {
         reply(docs);
@@ -125,8 +131,6 @@ internals.serialize = function (resource, data, schema) {
     });
     json[inflect.pluralize(resource)].push(sanitized);
   });
-
-  console.log(json);
 
   return json;
 };
