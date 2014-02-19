@@ -15,13 +15,5 @@
   "peerDependencies": {
     "hapi": "~2.1.0",
     "hapi-bearer": "~0.0.1"
-  },
-  "devDependencies": {
-    "grunt": "~0.4.2",
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt-develop": "~0.2.2",
-    "grunt-jslint": "~1.1.2"
   }
 }
-
-
