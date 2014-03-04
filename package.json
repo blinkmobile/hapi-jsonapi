@@ -13,7 +13,7 @@
     "underscore": "~1.5.2"
   },
   "peerDependencies": {
-    "hapi": "~2.1.0",
+    "hapi": "~2.6.0",
     "hapi-bearer": "~0.0.1",
     "hapi-db": "~0.0.1"
   }
