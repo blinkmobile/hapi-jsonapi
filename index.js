@@ -5,7 +5,7 @@ var _ = require('underscore');
 var internals = {};
 
 exports.register = function (plugin, options, next) {
-  plugin.dependency('hapi-bearer');
+  plugin.dependency(['hapi-bearer', 'hapi-db']);
   plugin.auth.strategy('bearer', 'bearer');
 
   plugin.expose('get', internals.get);
@@ -21,12 +21,19 @@ internals.get = function (resource, schema, server) {
   return {
     auth: 'bearer',
     handler: function (request, reply) {
+      var db = request.server.plugins['hapi-db'].db;
       if (request.params.id) {
-        server.helpers.find(resource, request.params.id, function (doc) {
+        db.collection(resource).findOne({_id: request.params.id}, function (err, doc) {
+          if (err) {
+            throw err;
+          }
           reply(internals.serialize(resource, [doc], schema));
         });
       } else {
-        server.helpers.findMany(resource, {}, function (docs) {
+        db.collection(resource).find({}, function (err, docs) {
+          if (err) {
+            throw err;
+          }
           reply(internals.serialize(resource, docs, schema));
         });
       }
@@ -39,7 +46,11 @@ internals.post = function (resource, schema, server, types) {
     auth: 'bearer',
     validate: internals.validate(resource, schema, types),
     handler: function (request, reply) {
-      server.helpers.insert(resource, internals.deserialize(resource, request.payload), function (docs) {
+      var db = request.server.plugins['hapi-db'].db;
+      db.collection(resource).insert(internals.deserialize(resource, request.payload), function (err, docs) {
+        if (err) {
+          throw err;
+        }
         reply(internals.serialize(resource, docs, schema));
       });
     }
@@ -51,8 +62,25 @@ internals.put = function (resource, schema, server, types) {
     auth: 'bearer',
     validate: internals.validate(resource, schema, types),
     handler: function (request, reply) {
-      server.helpers.update(resource, request.params.id, internals.deserialize(resource, request.payload), function (docs) {
-        reply(internals.serialize(resource, docs, schema));
+      var db = request.server.plugins['hapi-db'].db,
+        filtered = {};
+      _.each(internals.deserialize(resource, request.payload), function (value, key) {
+        if (value) {
+          filtered[key] = value;
+        }
+      });
+      db.collection(resource).update({_id: request.params.id}, {
+        $set: filtered
+      }, function (err) {
+        if (err) {
+          throw err;
+        }
+        db.collection(resource).findOne({_id: request.params.id}, function (err, docs) {
+          if (err) {
+            throw err;
+          }
+          reply(internals.serialize(resource, docs, schema));
+        });
       });
     }
   };
@@ -72,7 +100,11 @@ internals.delete = function (resource, schema, server) {
   return {
     auth: 'bearer',
     handler: function (request, reply) {
-      server.helpers.remove(resource, request.params.id, function (docs) {
+      var db = request.server.plugins['hapi-db'].db;
+      db.collection(resource).remove({_id: request.params.id}, function (err, docs) {
+        if (err) {
+          throw err;
+        }
         reply(docs);
       });
     }
