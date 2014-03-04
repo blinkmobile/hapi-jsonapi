@@ -14,6 +14,7 @@
   },
   "peerDependencies": {
     "hapi": "~2.1.0",
-    "hapi-bearer": "~0.0.1"
+    "hapi-bearer": "~0.0.1",
+    "hapi-db": "~0.0.1"
   }
 }
