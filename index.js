@@ -14,10 +14,12 @@ exports.register = function (plugin, options, next) {
   plugin.expose('patch', internals.patch);
   plugin.expose('delete', internals.delete);
 
+  internals.types = plugin.hapi.types;
+
   next();
 };
 
-internals.get = function (resource, schema, server) {
+internals.get = function (resource, schema) {
   return {
     auth: 'bearer',
     handler: function (request, reply) {
@@ -41,10 +43,10 @@ internals.get = function (resource, schema, server) {
   };
 };
 
-internals.post = function (resource, schema, server, types) {
+internals.post = function (resource, schema) {
   return {
     auth: 'bearer',
-    validate: internals.validate(resource, schema, types),
+    validate: internals.validate(resource, schema),
     handler: function (request, reply) {
       var db = request.server.plugins['hapi-db'].db;
       db.collection(resource).insert(internals.deserialize(resource, request.payload), function (err, docs) {
@@ -57,10 +59,10 @@ internals.post = function (resource, schema, server, types) {
   };
 };
 
-internals.put = function (resource, schema, server, types) {
+internals.put = function (resource, schema) {
   return {
     auth: 'bearer',
-    validate: internals.validate(resource, schema, types),
+    validate: internals.validate(resource, schema),
     handler: function (request, reply) {
       var db = request.server.plugins['hapi-db'].db,
         filtered = {};
@@ -86,17 +88,17 @@ internals.put = function (resource, schema, server, types) {
   };
 };
 
-internals.patch = function (resource, schema, server, types) {
+internals.patch = function (resource, schema) {
   return {
     auth: 'bearer',
-    validate: internals.validate(resource, schema, types),
+    validate: internals.validate(resource, schema),
     handler: function (request, reply) {
       reply('Not yet implemented. Sorry!');
     }
   };
 };
 
-internals.delete = function (resource, schema, server) {
+internals.delete = function (resource, schema) {
   return {
     auth: 'bearer',
     handler: function (request, reply) {
@@ -111,9 +113,10 @@ internals.delete = function (resource, schema, server) {
   };
 };
 
-internals.validate = function (resource, schema, types) {
+internals.validate = function (resource, schema) {
   var validation = {payload: {}},
-    resourceSchema = {};
+    resourceSchema = {},
+    types = internals.types;
 
   _.each(schema, function (value, key) {
     if (typeof value === "string" ||
