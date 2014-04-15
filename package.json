@@ -10,11 +10,12 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "i": "~0.3.2",
-    "underscore": "~1.5.2"
+    "underscore": "~1.5.2",
+    "node-uuid": "^1.4.1"
   },
   "peerDependencies": {
     "hapi": "~2.6.0",
     "hapi-bearer": "~0.0.1",
-    "hapi-db": "~0.0.1"
+    "hapi-mongodb": "~2.0.0"
   }
 }

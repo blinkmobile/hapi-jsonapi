@@ -3,6 +3,7 @@
 var inflect = require('i')();
 var _ = require('underscore');
 var internals = {};
+var uuid = require('node-uuid');
 
 exports.register = function (plugin, options, next) {
   plugin.dependency(['hapi-bearer', 'hapi-mongodb']);
@@ -48,8 +49,12 @@ internals.post = function (resource, schema) {
     auth: 'bearer',
     validate: internals.validate(resource, schema),
     handler: function (request, reply) {
-      var db = request.server.plugins['hapi-db'].db;
-      db.collection(resource).insert(internals.deserialize(resource, request.payload), function (err, docs) {
+      var db = request.server.plugins['hapi-mongodb'].db,
+        doc = internals.deserialize(resource, request.payload);
+
+      doc._id = uuid.v4();
+
+      db.collection(resource).insert(doc, function (err, docs) {
         if (err) {
           throw err;
         }
