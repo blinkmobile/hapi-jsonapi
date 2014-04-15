@@ -5,7 +5,7 @@ var _ = require('underscore');
 var internals = {};
 
 exports.register = function (plugin, options, next) {
-  plugin.dependency(['hapi-bearer', 'hapi-db']);
+  plugin.dependency(['hapi-bearer', 'hapi-mongodb']);
   plugin.auth.strategy('bearer', 'bearer');
 
   plugin.expose('get', internals.get);
@@ -23,7 +23,7 @@ internals.get = function (resource, schema) {
   return {
     auth: 'bearer',
     handler: function (request, reply) {
-      var db = request.server.plugins['hapi-db'].db;
+      var db = request.server.plugins['hapi-mongodb'].db;
       if (request.params.id) {
         db.collection(resource).findOne({_id: request.params.id}, function (err, doc) {
           if (err) {
@@ -64,7 +64,7 @@ internals.put = function (resource, schema) {
     auth: 'bearer',
     validate: internals.validate(resource, schema),
     handler: function (request, reply) {
-      var db = request.server.plugins['hapi-db'].db,
+      var db = request.server.plugins['hapi-mongodb'].db,
         filtered = {};
       _.each(internals.deserialize(resource, request.payload), function (value, key) {
         if (value) {
@@ -102,7 +102,7 @@ internals.delete = function (resource, schema) {
   return {
     auth: 'bearer',
     handler: function (request, reply) {
-      var db = request.server.plugins['hapi-db'].db;
+      var db = request.server.plugins['hapi-mongodb'].db;
       db.collection(resource).remove({_id: request.params.id}, function (err, docs) {
         if (err) {
           throw err;
