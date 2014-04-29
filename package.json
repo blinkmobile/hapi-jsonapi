@@ -1,6 +1,6 @@
 {
   "name": "hapi-jsonapi",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,7 @@
     "node-uuid": "^1.4.1"
   },
   "peerDependencies": {
-    "hapi": "~2.6.0",
+    "hapi": ">=2.x.x",
     "hapi-bearer": "~0.0.1",
     "hapi-mongodb": "~2.0.0"
   }
