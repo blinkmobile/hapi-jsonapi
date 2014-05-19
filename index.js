@@ -7,7 +7,6 @@ var uuid = require('node-uuid');
 
 exports.register = function (plugin, options, next) {
   plugin.dependency(['hapi-bearer', 'hapi-mongodb']);
-  plugin.auth.strategy('bearer', 'bearer');
 
   plugin.expose('get', internals.get);
   plugin.expose('post', internals.post);
