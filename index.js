@@ -6,7 +6,7 @@ var internals = {};
 var uuid = require('node-uuid');
 
 exports.register = function (plugin, options, next) {
-  plugin.dependency(['hapi-bearer', 'hapi-mongodb']);
+  plugin.dependency(['hapi-mongodb']);
 
   plugin.expose('get', internals.get);
   plugin.expose('post', internals.post);
@@ -15,13 +15,14 @@ exports.register = function (plugin, options, next) {
   plugin.expose('delete', internals.delete);
 
   internals.types = plugin.hapi.types;
+  internals.auth = options.auth || false;
 
   next();
 };
 
 internals.get = function (resource, schema) {
   return {
-    auth: 'bearer',
+    auth: internals.auth,
     handler: function (request, reply) {
       var db = request.server.plugins['hapi-mongodb'].db;
       if (request.params.id) {
@@ -45,7 +46,7 @@ internals.get = function (resource, schema) {
 
 internals.post = function (resource, schema) {
   return {
-    auth: 'bearer',
+    auth: internals.auth,
     validate: internals.validate(resource, schema),
     handler: function (request, reply) {
       var db = request.server.plugins['hapi-mongodb'].db,
@@ -65,7 +66,7 @@ internals.post = function (resource, schema) {
 
 internals.put = function (resource, schema) {
   return {
-    auth: 'bearer',
+    auth: internals.auth,
     validate: internals.validate(resource, schema),
     handler: function (request, reply) {
       var db = request.server.plugins['hapi-mongodb'].db,
@@ -94,7 +95,7 @@ internals.put = function (resource, schema) {
 
 internals.patch = function (resource, schema) {
   return {
-    auth: 'bearer',
+    auth: internals.auth,
     validate: internals.validate(resource, schema),
     handler: function (request, reply) {
       reply('Not yet implemented. Sorry!');
@@ -104,7 +105,7 @@ internals.patch = function (resource, schema) {
 
 internals.delete = function (resource, schema) {
   return {
-    auth: 'bearer',
+    auth: internals.auth,
     handler: function (request, reply) {
       var db = request.server.plugins['hapi-mongodb'].db;
       db.collection(resource).remove({_id: request.params.id}, function (err, docs) {
